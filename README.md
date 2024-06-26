@@ -23,7 +23,7 @@ The Clinic Appointment System consists of a frontend built with HTML, CSS, and J
 - MongoDB installed and running
 
 #### Installation Steps
-1. Clone the repository: `git clone https://github.com/your/repository.git`
+1. Clone the repository: `git clone https://github.com/kiki-ranaks/Clinic-Appointment-System/tree/main`
 2. Install dependencies: `npm install`
 3. Set up environment variables: Create a `.env` file with MongoDB URI and other configurations.
 
