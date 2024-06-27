@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinic Appointment System - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to right, #43cea2, #185a9d);
+        }
+        .login-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .login-container h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .login-container button:hover {
+            background-color: #218838;
+        }
+        .signup-link {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .signup-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .signup-popup h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .signup-popup input[type="text"],
+        .signup-popup input[type="password"],
+        .signup-popup input[type="date"],
+        .signup-popup input[type="number"],
+        .signup-popup select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .signup-popup button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .signup-popup button:hover {
+            background-color: #0056b3;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <input type="text" placeholder="Email" id="email">
+        <input type="password" placeholder="Password" id="password">
+        <button onclick="login()">Login</button>
+        <a href="#" class="signup-link" onclick="showSignup()">Signup</a>
+    </div>
+
+    <div class="signup-popup" id="signupPopup">
+        <span class="close-btn" onclick="closeSignup()">&times;</span>
+        <h2>Signup</h2>
+        <input type="text" placeholder="First Name" id="firstName">
+        <input type="text" placeholder="Last Name" id="lastName">
+        <select id="gender">
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Others">Others</option>
+        </select>
+        <input type="date" placeholder="Date of Birth" id="dob" onchange="calculateAge()">
+        <input type="number" placeholder="Age" id="age" readonly>
+        <input type="text" placeholder="Address" id="address">
+        <input type="text" placeholder="Contact Number" id="contactNumber">
+        <input type="text" placeholder="Email ID" id="signupEmail">
+        <button onclick="signup()">Signup</button>
+    </div>
+
+    <script>
+        function showSignup() {
+            document.getElementById('signupPopup').style.display = 'block';
+        }
+
+        function closeSignup() {
+            document.getElementById('signupPopup').style.display = 'none';
+        }
+
+        function calculateAge() {
+            var dob = new Date(document.getElementById('dob').value);
+            var diff_ms = Date.now() - dob.getTime();
+            var age_dt = new Date(diff_ms); 
+            var age = Math.abs(age_dt.getUTCFullYear() - 1970);
+            document.getElementById('age').value = age;
+        }
+
+        function login() {
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Login successful") {
+                    alert("Login successful");
+                    window.location.href = "home.html"; // Redirect to home page
+                } else {
+                    alert("Invalid credentials");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function signup() {
+            var firstName = document.getElementById('firstName').value;
+            var lastName = document.getElementById('lastName').value;
+            var gender = document.getElementById('gender').value;
+            var dob = document.getElementById('dob').value;
+            var age = document.getElementById('age').value;
+            var address = document.getElementById('address').value;
+            var contactNumber = document.getElementById('contactNumber').value;
+            var email = document.getElementById('signupEmail').value;
+
+            fetch('/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    first_name: firstName,
+                    last_name: lastName,
+                    gender: gender,
+                    dob: dob,
+                    age: age,
+                    address: address,
+                    contact_number: contactNumber,
+                    email: email
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Signup successful, email sent") {
+                    alert("Signup successful, email sent");
+                    closeSignup();
+                } else {
+                    alert("Signup successful, but email failed to send");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>

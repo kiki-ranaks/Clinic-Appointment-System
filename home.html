@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinic Appointment System - Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            background-image: url('hospital.jpg');
+            background: linear-gradient(to left, #43cea2, #185a9d);
+        }
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .container {
+            padding: 20px;
+        }
+        .info-box {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .toggle-menu {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .menu {
+            display: none;
+            position: fixed;
+            top: 50px;
+            left: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .menu a {
+            display: block;
+            padding: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .menu a:hover {
+            background-color: #f4f4f4;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .popup h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .popup input[type="text"],
+        .popup input[type="date"],
+        .popup input[type="time"],
+        .popup select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .popup button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .popup button:hover {
+            background-color: #0056b3;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .appointments-grid {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+        .appointments-grid table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .appointments-grid th, .appointments-grid td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+        .appointments-grid th {
+            background-color: #007bff;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Clinic Appointment System</h1>
+    </div>
+    <div class="container">
+        <div class="info-box">
+            <h2>My Booking</h2>
+            <p>Total number of Bookings: <span id="totalBookings">0</span></p>
+        </div>
+        <div class="info-box">
+            <h2>Next Booking Date</h2>
+            <p>Next Appointment Date: <span id="nextBookingDate">N/A</span></p>
+        </div>
+    </div>
+    <div class="toggle-menu" onclick="toggleMenu()">☰</div>
+    <div class="menu" id="menu">
+        <a href="#" onclick="showBookAppointment()">Book Appointment</a>
+        <a href="#" onclick="showAppointments()">My Appointments</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </div>
+
+    <div class="popup" id="bookAppointmentPopup">
+        <span class="close-btn" onclick="closeBookAppointment()">&times;</span>
+        <h2>Book Appointment</h2>
+        <input type="text" placeholder="First Name" id="firstName" readonly>
+        <input type="text" placeholder="Last Name" id="lastName" readonly>
+        <input type="text" placeholder="Gender" id="gender" readonly>
+        <input type="date" placeholder="Date of Birth" id="dob" readonly>
+        <input type="text" placeholder="Age" id="age" readonly>
+        <input type="date" placeholder="Appointment Date" id="appointmentDate">
+        <input type="time" placeholder="Time" id="time">
+        <select id="doctorName">
+            <option value="Doctor 1">Doctor 1</option>
+            <option value="Doctor 2">Doctor 2</option>
+        </select>
+        <input type="text" placeholder="Purpose of Visit" id="purposeOfVisit">
+        <button onclick="bookAppointment()">Book Appointment</button>
+    </div>
+
+    <div class="appointments-grid" id="appointmentsGrid">
+        <span class="close-btn" onclick="closeAppointments()">&times;</span>
+        <h2>My Appointments</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Appointment Date</th>
+                    <th>Time</th>
+                    <th>Patient Name</th>
+                    <th>Age</th>
+                    <th>Purpose of Visit</th>
+                    <th>Doctor Name</th>
+                </tr>
+            </thead>
+            <tbody id="appointmentsTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            var menu = document.getElementById('menu');
+            if (menu.style.display === 'block') {
+                menu.style.display = 'none';
+            } else {
+                menu.style.display = 'block';
+            }
+        }
+
+        function showBookAppointment() {
+            document.getElementById('bookAppointmentPopup').style.display = 'block';
+        }
+
+        function closeBookAppointment() {
+            document.getElementById('bookAppointmentPopup').style.display = 'none';
+        }
+
+        function showAppointments() {
+            document.getElementById('appointmentsGrid').style.display = 'block';
+            fetchAppointments();
+        }
+
+        function closeAppointments() {
+            document.getElementById('appointmentsGrid').style.display = 'none';
+        }
+
+        function bookAppointment() {
+            var firstName = document.getElementById('firstName').value;
+            var lastName = document.getElementById('lastName').value;
+            var gender = document.getElementById('gender').value;
+            var dob = document.getElementById('dob').value;
+            var age = document.getElementById('age').value;
+            var appointmentDate = document.getElementById('appointmentDate').value;
+            var time = document.getElementById('time').value;
+            var doctorName = document.getElementById('doctorName').value;
+            var purposeOfVisit = document.getElementById('purposeOfVisit').value;
+
+            fetch('/book_appointment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    first_name: firstName,
+                    last_name: lastName,
+                    gender: gender,
+                    dob: dob,
+                    age: age,
+                    appointment_date: appointmentDate,
+                    time: time,
+                    doctor_name: doctorName,
+                    purpose_of_visit: purposeOfVisit
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Appointment booked successfully") {
+                    alert("Appointment booked successfully");
+                    closeBookAppointment();
+                    fetchBookingInfo();
+                } else {
+                    alert("Failed to book appointment");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function fetchAppointments() {
+            fetch('/appointments')
+                .then(response => response.json())
+                .then(data => {
+                    var tableBody = document.getElementById('appointmentsTableBody');
+                    tableBody.innerHTML = '';
+                    data.forEach(appointment => {
+                        var row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${appointment.appointment_date}</td>
+                            <td>${appointment.time}</td>
+                            <td>${appointment.first_name} ${appointment.last_name}</td>
+                            <td>${appointment.age}</td>
+                            <td>${appointment.purpose_of_visit}</td>
+                            <td>${appointment.doctor_name}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function logout() {
+            // Clear any session or authentication data here
+            window.location.href = "login.html"; // Redirect to login page
+        }
+
+        function fetchBookingInfo() {
+            fetch('/appointments')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('totalBookings').innerText = data.length;
+                    if (data.length > 0) {
+                        document.getElementById('nextBookingDate').innerText = data[0].appointment_date;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        window.onload = fetchBookingInfo;
+    </script>
+</body>
+</html>
